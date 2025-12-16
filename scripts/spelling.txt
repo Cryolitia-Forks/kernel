@@ -1256,6 +1256,7 @@ queing||queuing
 quering||querying
 queus||queues
 randomally||randomly
+ransport||transport
 raoming||roaming
 reasearcher||researcher
 reasearchers||researchers
@@ -1337,6 +1338,8 @@ ressizes||resizes
 ressource||resource
 ressources||resources
 restesting||retesting
+restiction||restriction
+restictions||restrictions
 resumbmitting||resubmitting
 retransmited||retransmitted
 retreived||retrieved

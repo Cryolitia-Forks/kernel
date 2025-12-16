@@ -153,7 +153,7 @@ static void __init acpi_process_madt(void)
 
 int pptt_enabled;
 
-int __init parse_acpi_topology(void)
+void __init parse_acpi_topology(void)
 {
 	int cpu, topology_id;
 
@@ -161,23 +161,23 @@ int __init parse_acpi_topology(void)
 		topology_id = find_acpi_cpu_topology(cpu, 0);
 		if (topology_id < 0) {
 			pr_warn("Invalid BIOS PPTT\n");
-			return -ENOENT;
+			return;
 		}
 
 		if (acpi_pptt_cpu_is_thread(cpu) <= 0)
 			cpu_data[cpu].core = topology_id;
 		else {
 			topology_id = find_acpi_cpu_topology(cpu, 1);
-			if (topology_id < 0)
-				return -ENOENT;
+			if (topology_id < 0) {
+				pr_warn("Invalid BIOS PPTT\n");
+				return;
+			}
 
 			cpu_data[cpu].core = topology_id;
 		}
 	}
 
 	pptt_enabled = 1;
-
-	return 0;
 }
 
 #ifndef CONFIG_SUSPEND
@@ -293,11 +293,17 @@ acpi_numa_x2apic_affinity_init(struct acpi_srat_x2apic_cpu_affinity *pa)
 		return;
 	}
 
+/*
+ * apic_id's type is u8.
+ * Conditionally skip this check to silence compiler warnings.
+ */
+#if CONFIG_NR_CPUS < 256
 	if (pa->apic_id >= CONFIG_NR_CPUS) {
 		pr_info("SRAT: PXM %u -> CPU 0x%02x -> Node %u skipped apicid that is too big\n",
 				pxm, pa->apic_id, node);
 		return;
 	}
+#endif /* CONFIG_NR_CPUS < 256 */
 
 	early_numa_add_cpu(pa->apic_id, node);
 
